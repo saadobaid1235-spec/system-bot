@@ -12,7 +12,6 @@ bot = commands.Bot(command_prefix=".", intents=intents)
 
 warnings_db = {}
 
-# --- دالة تلقائية لإنشاء وضبط الرتب عند تشغيل البوت ---
 async def setup_guild_roles(guild):
     mute_role = discord.utils.get(guild.roles, name="ميوت")
     if not mute_role:
@@ -45,25 +44,17 @@ async def on_ready():
 async def on_guild_join(guild):
     await setup_guild_roles(guild)
 
-# --- نظام الردود التلقائية والأخطاء (هنا العيار الثقيل) ---
 @bot.event
 async def on_command_error(ctx, error):
-    # لو ما عنده صلاحية (إدارية)
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send(f"❌ يا {ctx.author.mention}، سر أمها انت حافي منتف! ما عندك رتبة إدارية تخليك تستخدم هالأمر 😂.")
-    
-    # لو نسي يكتب اسم العضو أو البيانات المطلوبة
+        await ctx.send(f"❌ يا {ctx.author.mention}، ما عندك رتبة إدارية تخليك تستخدم هالأمر 😂.")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(f"⚠️ يا غالي أمرك ناقص! تأكد من كتابة الأمر بالطريقة الصحيحة (مثال: `.سجن @العضو`)")
-    
-    # لو الأمر مو موجود أصلاً
+        await ctx.send(f"⚠️ يا غالي أمرك ناقص! تأكد من كتابة الأمر بالطريقة الصحيحة.")
     elif isinstance(error, commands.CommandNotFound):
-        return  # يتجاهله عشان ما يزعج الشات
-    
+        return
     else:
         print(f"خطأ غير متوقع: {error}")
 
-# --- أزرار التذاكر التفاعلية ---
 class TicketView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -132,14 +123,11 @@ async def setup_tickets_msg(ctx):
     except:
         pass
 
-# --- أوامر الإدارة والعقوبات (مع فحص الرتب الأعلى) ---
-
 @bot.command(name='سجن', aliases=['j'])
 @commands.has_permissions(administrator=True)
 async def jail_member(ctx, member: discord.Member, *, reason="لا توجد سبب"):
-    # التحقق لو العضو اللي بينعاقب رتبته أعلى من الإداري أو مساوي له
     if ctx.author.top_role <= member.top_role and ctx.author != ctx.guild.owner:
-        await ctx.send(f"❌ يا {ctx.author.mention}، وين رايح؟ العضو هذا رتبته أعلى منك أو مساوي لك، ما تقدر تسجنه! 🛑")
+        await ctx.send(f"❌ يا {ctx.author.mention}، العضو هذا رتبته أعلى منك أو مساوي لك، ما تقدر تسجنه! 🛑")
         return
 
     guild = ctx.guild
@@ -153,7 +141,7 @@ async def jail_member(ctx, member: discord.Member, *, reason="لا توجد سب
         await member.add_roles(jail_role, reason=reason)
         await ctx.send(f"🔒 تم سجن العضو {member.mention} بنجاح.\n📝 السبب: {reason}")
     except Exception as e:
-        await ctx.send(f"❌ حدث خطأ أثناء محاولة السجن: تأكد أن رتبة البوت أعلى من العضو المستهدف.")
+        await ctx.send(f"❌ حدث خطأ أثناء محاولة السجن.")
 
 @bot.command(name='فك_سجن', aliases=['uj'])
 @commands.has_permissions(administrator=True)
