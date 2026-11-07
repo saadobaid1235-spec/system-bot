@@ -239,4 +239,4 @@ async def system_help(ctx):
     embed.add_field(name=".setup_tickets", value="إرسال لوحة أزرار التذاكر في الشات الحالي", inline=False)
     await ctx.send(embed=embed)
 
-bot.run(os.getenv('DISCORD_TOKEN'))
+bot.run('MTU2NzY5ODExNDIyMjIzNTcwOA.GImOhb.YBGh0qLq7W7w5chMJcqtTVLxAopGVwncpK56Lw')
